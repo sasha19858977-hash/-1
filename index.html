@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>StudyPlanner</title>
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+<body>
+    <div class="background"></div>
+    <div class="background-overlay"></div>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                ✦
+            </div>
+            <span>
+                StudyPlanner
+            </span>
+        </div>
+        <div class="nav-links">
+            <a
+                href="#home"
+                class="active"
+            >
+                <span>⌂</span>
+                Головна
+            </a>
+            <a href="#tasks">
+                <span>☷</span>
+                Завдання
+            </a>
+            <a href="#statistics">
+                <span>◈</span>
+                Статистика
+            </a>
+            <a href="#about">
+                <span>ⓘ</span>
+                Про проєкт
+            </a>
+        </div>
+        <div class="online">
+            <span class="online-dot"></span>
+            Online
+        </div>
+    </nav>
+    <main
+        class="container"
+        id="home"
+    >
+        <section class="hero">
+            <div>
+                <div class="hero-label">
+                    ТВІЙ НАВЧАЛЬНИЙ ПРОСТІР
+                </div>
+                <h1>
+                    Плануй.
+                    <span>Виконуй.</span>
+                    Розвивайся.
+                </h1>
+                <p>
+                    Усі навчальні завдання в одному місці
+                </p>
+            </div>
+            <div class="date-box">
+                <span>
+                    Сьогодні
+                </span>
+                <strong id="todayDate">
+                    00.00.0000
+                </strong>
+            </div>
+        </section>
+        <div class="dashboard">
+            <section class="card add-card">
+                <div class="card-header">
+                    <div class="card-icon purple">
+                        +
+                    </div>
+                    <div>
+                        <small>
+                            НОВЕ ЗАВДАННЯ
+                        </small>
+                        <h2>
+                            Додати завдання
+                        </h2>
+                    </div>
+                </div>
+                <div class="form">
+                    <input
+                        type="text"
+                        id="taskInput"
+                        placeholder="Назва завдання..."
+                        autocomplete="off"
+                    >
+                    <select id="subjectInput">
+                        <option value="Веброзробка">
+                            💻 Веброзробка
+                        </option>
+                        <option value="Бази даних">
+                            🗄️ Бази даних
+                        </option>
+                        <option value="Програмування">
+                            👨‍💻 Програмування
+                        </option>
+                        <option value="Математика">
+                            📐 Математика
+                        </option>
+                        <option value="Англійська">
+                            🇬🇧 Англійська
+                        </option>
+                        <option value="Українська">
+                            🇺🇦 Українська
+                        </option>
+                        <option value="Інше">
+                            📚 Інше
+                        </option>
+                    </select>
+                    <input
+                        type="date"
+                        id="dateInput"
+                    >
+                    <select id="priorityInput">
+                        <option value="Низький">
+                            🟢 Низький
+                        </option>
+                        <option value="Середній">
+                            🟠 Середній
+                        </option>
+                        <option value="Високий">
+                            🔴 Високий
+                        </option>
+                    </select>
+                    <button
+                        class="add-button"
+                        type="button"
+                        onclick="addTask()"
+                    >
+                        ＋ Додати завдання
+                    </button>
+
+                </div>
+            </section>
+            <section class="card voice-card">
+                <div class="card-header">
+                    <div class="card-icon blue">
+                        🎤
+                    </div>
+                    <div>
+                        <small>
+                            ГОЛОСОВЕ КЕРУВАННЯ
+                        </small>
+                        <h2>
+                            Керування голосом
+                        </h2>
+                    </div>
+                </div>
+                <div class="voice-controls">
+                    <select id="languageSelect">
+                        <option value="uk-UA">
+                            🇺🇦 Українська
+                        </option>
+                        <option value="en-US">
+                            🇬🇧 English
+                        </option>
+                        <option value="pl-PL">
+                            🇵🇱 Polski
+                        </option>
+                    </select>
+                    <button
+                        id="voiceButton"
+                        class="voice-button"
+                        type="button"
+                        onclick="startVoiceRecognition()"
+                    >
+                        🎤 Почати слухати
+                    </button>
+                    <div
+                        id="voiceStatus"
+                        class="voice-status"
+                    >
+                        👂 Натисніть кнопку та скажіть команду.
+                    </div>
+                    <div
+                        id="aiAnswer"
+                        class="voice-status"
+                    >
+                        💡 Приклади: «додай завдання математика»
+                    </div>
+                </div>
+            </section>
+            <section
+                class="card tasks-card"
+                id="tasks"
+            >
+                <div class="card-header">
+                    <div class="card-icon blue">
+                        ✓
+                    </div>
+                    <div>
+                        <small>
+                            WORKSPACE
+                        </small>
+                        <h2>
+                            Мої завдання
+                        </h2>
+                    </div>
+                </div>
+                <div class="filters">
+                    <button
+                        class="filter-btn active"
+                        type="button"
+                        onclick="filterTasks('all', this)"
+                    >
+                        Усі
+                    </button>
+                    <button
+                        class="filter-btn"
+                        type="button"
+                        onclick="filterTasks('active', this)"
+                    >
+                        Активні
+                    </button>
+                    <button
+                        class="filter-btn"
+                        type="button"
+                        onclick="filterTasks('completed', this)"
+                    >
+                        Виконані
+                    </button>
+                </div>
+                <div id="taskList">
+                    <div class="empty-message">
+                        ✦ Завдань поки немає
+                    </div>
+                </div>
+            </section>
+            <section
+                class="card statistics-card"
+                id="statistics"
+            >
+                <div class="card-header">
+                    <div class="card-icon green">
+                        ↗
+                    </div>
+                    <div>
+                        <small>
+                            OVERVIEW
+                        </small>
+                        <h2>
+                            Статистика
+                        </h2>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon purple">
+                        ☷
+                    </div>
+                    <div>
+                        <strong id="totalCount">
+                            0
+                        </strong>
+                        <span>
+                            Усього завдань
+                        </span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon green">
+                        ✓
+                    </div>
+                    <div>
+                        <strong id="completedCount">
+                            0
+                        </strong>
+                        <span>
+                            Виконано
+                        </span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon orange">
+                        ◷
+                    </div>
+                    <div>
+                        <strong id="remainingCount">
+                            0
+                        </strong>
+                        <span>
+                            Залишилось
+                        </span>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="progress-info">
+                        <span>
+                            Загальний прогрес
+                        </span>
+                        <strong id="progressText">
+                            0%
+                        </strong>
+                    </div>
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            id="progressFill"
+                        ></div>
+                    </div>
+                </div>
+                <div class="motivation">
+                    ✦
+                    <span>
+                        Маленькі кроки щодня
+                        створюють великий результат.
+                    </span>
+                </div>
+            </section>
+        </div>
+        <section
+            class="about"
+            id="about"
+        >
+            <div>
+                <small>
+                    ABOUT PROJECT
+                </small>
+                <h2>
+                    StudyPlanner
+                </h2>
+            </div>
+            <p>
+                Простий вебзастосунок для планування,
+                контролю та організації навчальних завдань.
+            </p>
+            <div class="technologies">
+                <span>
+                    HTML5
+                </span>
+                <span>
+                    CSS3
+                </span>
+                <span>
+                    JavaScript
+                </span>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <span>
+            ✦ StudyPlanner
+        </span>
+        <span>
+            © 2026
+        </span>
+        <span>
+            Створено для студентів
+        </span>
+    </footer>
+    <script src="script.js"></script>
+    <script src="voice.js"></script>
+</body>
+</html>
