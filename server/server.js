@@ -2,14 +2,9 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const OpenAI = require("openai");
 
 const app = express();
 const port = 3000;
-
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
 
 app.use(cors());
 app.use(express.json());
@@ -49,7 +44,7 @@ app.post("/api/ai", async (req, res) => {
 Користувач спілкується з тобою ${languageName}.
 
 Поточна дата: ${currentDate || "невідома"}
-Поточний час: ${currentTime || "невідомий"}
+Поточний 시간: ${currentTime || "невідомий"}
 
 Список навчальних завдань користувача:
 ${JSON.stringify(tasks, null, 2)}
@@ -74,24 +69,50 @@ ${message}
 
 Відповідай природно, коротко та зрозуміло.
 `;
+       const apiKey = process.env.OPENAI_API_KEY;
 
-        const response = await client.responses.create({
-            model: "gpt-5.6-luna",
-            input: prompt
-        });
+if (!apiKey) {
+    throw new Error("Не знайдено OPENAI_API_KEY у файлі .env");
+}
 
-        res.json({
-            answer: response.output_text
-        });
+const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+        model: "gpt-4.1-mini",
+        input: prompt
+    })
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+    console.error("Помилка OpenAI API:", data);
+    return res.status(response.status).json({
+        error: data.error?.message || "Помилка OpenAI API"
+    });
+}
+
+const answer = data.output_text;
+
+if (!answer) {
+    console.error("Неочікувана відповідь OpenAI:", data);
+    return res.status(500).json({
+        error: "AI не повернув текст відповіді"
+    });
+}
+
+return res.json({ answer });
     } catch (error) {
-        console.error(error);
-
+        console.error("Критична помилка сервера:", error);
         res.status(500).json({
             error: "Не вдалося отримати відповідь від AI"
         });
     }
 });
-
 app.listen(port, () => {
     console.log(`StudyPlanner AI server запущено: http://localhost:${port}`);
 });

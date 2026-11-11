@@ -458,12 +458,82 @@ function setupKeyboard() {
         }
     );
 }
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-        loadTasks();
-        showCurrentDate();
-        renderTasks();
-        setupKeyboard();
+document.addEventListener("DOMContentLoaded", function() {
+    loadTasks();
+    showCurrentDate();
+    renderTasks();
+    setupKeyboard();
+});
+
+function handleAiKeydown(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendToAi();
     }
-);
+}
+async function sendToAi() {
+    const inputEl = document.getElementById("aiChatInput");
+    const messagesContainer = document.getElementById("aiChatMessages");
+    const langSelect = document.getElementById("languageSelect"); 
+    if (!inputEl || !messagesContainer) return;
+    const userText = inputEl.value.trim();
+    if (userText === "") return;
+    appendAiChatMessage(userText, "user-message");
+    inputEl.value = ""; 
+    const loadingId = "ai-loading-" + Date.now();
+    appendAiChatMessage("Секунду, аналізую завдання...", "ai-message", loadingId);
+    
+    try {
+        const today = new Date();
+        const currentDate = today.toLocaleDateString("uk-UA");
+        const currentTime = today.toLocaleTimeString("uk-UA", { hour: '2-digit', minute: '2-digit' });
+        const selectedLanguage = langSelect ? langSelect.value : "uk-UA";
+        const response = await fetch('http://localhost:3000/api/ai', {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({ 
+                message: userText,
+                tasks: typeof tasks !== 'undefined' ? tasks : [], 
+                language: selectedLanguage,
+                currentDate: currentDate,
+                currentTime: currentTime
+            })
+        });
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `Статус ${response.status}`);
+        }
+        const data = await response.json();
+        const loadingElement = document.getElementById(loadingId);
+        if (loadingElement) loadingElement.remove();
+        if (data && data.answer) {
+            appendAiChatMessage(data.answer, "ai-message");
+        } else if (data.error) {
+            appendAiChatMessage(`🤖 Помилка сервера: ${data.error}`, "ai-message");
+        } else {
+            appendAiChatMessage("🤖 Сервер не повернув текст відповіді.", "ai-message");
+        }
+    } catch (error) {
+        const loadingElement = document.getElementById(loadingId);
+        if (loadingElement) loadingElement.remove();
+        console.error("Помилка зв'язку з бекендом:", error);
+        appendAiChatMessage(`❌ Помилка: ${error.message}. Перевірте, чи запущено сервер Node.js у терміналі VS Code (node server.js).`, "ai-message");
+    }
+}
+function appendAiChatMessage(text, className, id = null) {
+    const container = document.getElementById("aiChatMessages");
+    if (!container) return;
+    const msgEl = document.createElement("div");
+    msgEl.className = `message ${className}`;
+    if (id) msgEl.id = id;
+    const cleanText = String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    msgEl.innerHTML = cleanText.replace(/\n/g, "<br>"); 
+    container.appendChild(msgEl);
+    container.scrollTop = container.scrollHeight; 
+}

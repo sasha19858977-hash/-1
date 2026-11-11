@@ -44,7 +44,6 @@
                 <span>ⓘ</span>
                 Про проєкт
             </a>
-            </a>
             <a href="#about">
                 <span>!</span>
                 Як користуватись додатком
@@ -246,6 +245,26 @@
                     </div>
                 </div>
             </section>
+             <div id="aiChatWindow" class="ai-container-window">
+                <div class="ai-chat-header">
+                    <h3>✦ AI Навчальний Помічник</h3>
+                </div>
+                <div id="aiChatMessages" class="ai-chat-messages">
+                    <div class="message ai-message">
+                        Привіт! Я твій ШІ-асистент. Можу проаналізувати твої завдання, підказати, з чого почати, або допомогти розбити складну тему на кроки.
+                    </div>
+                </div>
+                <div class="ai-chat-input-area">
+                    <input 
+                        type="text" 
+                        id="aiChatInput" 
+                        placeholder="Запитай ШІ про свої завдання..." 
+                        onkeydown="handleAiKeydown(event)"
+                        autocomplete="off"
+                    >
+                    <button type="button" onclick="sendToAi()">Надіслати</button>
+                </div>
+            </div>
             <section
                 class="card statistics-card"
                 id="statistics"
